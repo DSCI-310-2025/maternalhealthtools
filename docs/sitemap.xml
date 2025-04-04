@@ -1,0 +1,19 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/maternalhealthtools-vignette.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/check_na.html</loc></url>
+<url><loc>/reference/clean.html</loc></url>
+<url><loc>/reference/get_targets.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/testing.html</loc></url>
+<url><loc>/reference/training_mlr_model.html</loc></url>
+<url><loc>/reference/training_rf_model.html</loc></url>
+<url><loc>/reference/visualization.html</loc></url>
+</urlset>
+
