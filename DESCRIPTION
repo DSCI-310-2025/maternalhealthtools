@@ -1,0 +1,31 @@
+Package: maternalhealthtools
+Title: Maternal Health Analysis Tools
+Version: 0.0.0.9000
+Authors@R: 
+    c(
+    person("Roy", "Oh", , "roy.oh@example.com", role = c("aut", "cre")),
+    person("Kim", "Tan Palanca", , "kim.tanpalanca@example.com", role = "aut"),
+    person("Nicolas", "Zhu", , "nicolas.zhu@example.com", role = "aut"),
+    person("Mengen", "Liu", , "mengen.liu@example.com", role = "aut")
+    )
+Description: Provides functions to clean maternal health data, train and test models 
+  including multinomial logistic regression and random forest, and generate informative visualizations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    dplyr,
+    tidyr,
+    tibble,
+    ggplot2,
+    randomForest,
+    nnet,
+    caret,
+    vip,
+    magrittr
+Suggests: 
+    testthat (>= 3.0.0),
+    tidyverse
+Config/testthat/edition: 3
+
