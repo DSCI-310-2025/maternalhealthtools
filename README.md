@@ -16,7 +16,7 @@ generating plot for exploratory analysis and model interpretation.
 
 You can install the development version of maternalhealthtools from:
 
-[GitHub](https://github.com/HAVETOCHANGETHIS) with:
+[GitHub](https://github.com/DSCI-310-2025/maternalhealthtools.git) with:
 
 ``` r
 # install.packages("devtools")
@@ -55,14 +55,6 @@ makes it easier to spot where cleaning is needed.
 
 ``` r
 cleaned_df <- clean(df, RiskLevel)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 cleaned_df
 #>   Age BloodPressure RiskLevel
 #> 1  25           120  low risk
@@ -100,7 +92,7 @@ train_data <- data.frame(
 mlr_model <- training_mlr_model(train_data)
 summary(mlr_model)
 #> Call:
-#> multinom(formula = RiskLevel ~ ., data = train_data, trace = FALSE)
+#> nnet::multinom(formula = RiskLevel ~ ., data = train_data, trace = FALSE)
 #> 
 #> Coefficients:
 #>          (Intercept)       Age SystolicBP DiastolicBP        BS   BodyTemp
@@ -127,13 +119,6 @@ based on the data.
 
 ``` r
 rf_model <- training_rf_model(train_data)
-#> randomForest 4.7-1.2
-#> Type rfNews() to see new features/changes/bug fixes.
-#> 
-#> Attaching package: 'randomForest'
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     combine
 print(rf_model)
 #> 
 #> Call:

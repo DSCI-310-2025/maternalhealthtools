@@ -25,7 +25,7 @@ The goal of maternalhealthtools is to provide reusable functions for cleaning, t
 
 You can install the development version of maternalhealthtools from:
 
-[GitHub](https://github.com/HAVETOCHANGETHIS) with:
+[GitHub](https://github.com/DSCI-310-2025/maternalhealthtools.git) with:
 
 ``` r
 # install.packages("devtools")
