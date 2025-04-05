@@ -106,7 +106,7 @@ This function is useful for model visualization and interpretation. It saves the
 
 ```{r}
 # Example usage
-# 1. Confusion Matrix Plot example
+# 1. Confusion Matrix Plot
 
 # helper_conf_table <- data.frame(
 #                True = c("low risk", "mid risk", "high risk",

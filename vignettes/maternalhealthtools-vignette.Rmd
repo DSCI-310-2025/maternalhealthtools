@@ -16,4 +16,123 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(maternalhealthtools)
+library(dplyr)
 ```
+
+## Introduction
+
+The `maternalhealthtools` package provides a set of tools for cleaning data, training and testing models, and visualizing outcomes for maternal health data. This vignette provides a full example using the `maternalhealthtools` package. 
+
+## 1. Sample Data
+We will being by creating a sample data for the example.
+```{r}
+sample_df <- data.frame(
+  Age = c(25, 30, 35, NA, 42, 29, 38, 31, NA, 40),
+  SystolicBP = c(120, 130, 135, 115, 140, 125, 135, 128, 122, NA),
+  DiastolicBP = c(80, 85, 78, 75, 90, NA, 82, 84, 79, 77),
+  BS = c(5.6, 6.2, 4.9, 7.1, NA, 5.8, 6.4, NA, 5.9, 6.3),
+  BodyTemp = c(98.6, 99.1, 97.9, 98.4, 98.9, NA, 98.2, 98.7, 98.5, 99.0),
+  HeartRate = c(72, 80, 76, 74, 85, 78, NA, 82, 79, 77),
+  RiskLevel = c("low risk", "mid risk", "high risk", "low risk", NA,
+                "mid risk", "high risk", "low risk", "mid risk", "high risk"),
+  stringsAsFactors = FALSE
+)
+
+sample_df
+```
+
+## 2. Check for Missing Values
+We use `check_na()` to identify where missing values exist.
+```{r}
+check_na(sample_df)
+```
+
+## 3. Clean the data
+By using `clean()`, we clean the data by removing the rows with missing values and converting the target column `RiskLevel` into a factor.
+```{r}
+cleaned_df <- clean(sample_df, RiskLevel)
+cleaned_df
+```
+
+## 4. Get Target Classes
+Use `get_targets()` to inspect the unique classes in the target column.
+```{r}
+get_targets(cleaned_df, RiskLevel)
+```
+
+## 5. Train Models
+Now that we have clean data, we can start training them. Here is how we train two models, multinomial logistic regression and random forest model, using the provided training functions. 
+
+```{r}
+train_data <- cleaned_df
+
+mlr_model <- training_mlr_model(train_data)
+print(mlr_model)
+```
+
+```{r}
+rf_model <- training_rf_model(train_data)
+print(rf_model)
+```
+## 6. Model Testing
+With `testing()`, you can test a saved model on a new dataset. This step is commented out because it requires a saved .rds file.
+
+```{r}
+# test_results <- testing("models/mlr_model.rds", test_data)
+# print(test_results)
+```
+
+## 7. Visualization
+To help interpretation, `visualization()` helps generate three types of plots: confusion matrix, random forest feature importance, and predicted probabilities. To avoid creating files in the vignette, we show an examples without running them. 
+```{r}
+# 1. Confusion Matrix Plot
+
+# helper_conf_table <- data.frame(
+#                True = c("low risk", "mid risk", "high risk",
+#                        "low risk", "mid risk", "high risk",
+#                        "low risk", "mid risk", "high risk"),
+#                Predicted = c("low risk", "low risk", "low risk",
+#                                "mid risk", "mid risk", "mid risk",
+#                                "high risk", "high risk", "high risk"),
+#                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
+#                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0))
+#                
+# visualization("conf_matrix", helper_conf_table, conf_type = "mlr", output_dir = "outputs")
+
+
+# 2. Random Forest Feature Importance plot
+
+# rf_model <- training_rf_model(train_data)
+
+# visualization("feature_importance", rf_model, conf_type = NULL, output_dir = "outputs")
+
+# 3. Predicted Probability vs Blood Sugar plot
+
+# prob_table <- data.frame(
+#   BS = c(4.5, 5.0, 5.5, 6.0, 6.5, 7.0),
+#   Probability = c(0.2, 0.3, 0.5, 0.6, 0.7, 0.9),
+#   RiskLevel = factor(c("low risk", "low risk", "mid risk", "mid risk", "high risk", "high risk"))
+#   )
+
+# visualization("pred_prob", prob_table, conf_type = NULL, output_dir = "outputs")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
