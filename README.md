@@ -4,6 +4,7 @@
 # maternalhealthtools
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of maternalhealthtools is to provide reusable functions for
