@@ -79,5 +79,5 @@ clean <- function(data, target) {
     data <- data %>%
       dplyr::mutate({{ target }} := as.factor({{ target }}))
   }
-  data %>% tidyr::drop_na()
+  data %>% tidyr::drop_na() %>% dplyr::distinct()
 }
