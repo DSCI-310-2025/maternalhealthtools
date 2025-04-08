@@ -3,8 +3,10 @@ library(maternalhealthtools)
 library(dplyr)
 library(ggplot2)
 library(randomForest)
-library(tidyverse)
+library(tibble)
 library(caret)
+library(vip)
+library(nnet)
 
 if (!dir.exists("outputs/images")) {
   dir.create("outputs/images", recursive = TRUE)
