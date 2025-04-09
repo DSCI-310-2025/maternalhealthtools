@@ -75,5 +75,6 @@ test_that("plot functions throw errors for invalid input", {
   expect_error(plot_conf_matrix("not a df", "mlr", "outputs/images"))
   expect_error(plot_conf_matrix(data.frame(), "invalid_type", "outputs/images"))
   expect_error(plot_feature_importance("not a model", "outputs/images"))
+  expect_error(plot_feature_importance(data.frame(), data.frame()))
   expect_error(plot_pred_prob("not a df", "outputs/images"))
 })
