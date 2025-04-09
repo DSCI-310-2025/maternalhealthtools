@@ -75,46 +75,49 @@ rf_model <- training_rf_model(train_data)
 print(rf_model)
 ```
 ## 6. Model Testing
-With `testing()`, you can test a saved model on a new dataset. This step is commented out because it requires a saved .rds file.
+With `testing()`, you can test a saved model on a new dataset.
 
-```{r}
-# test_results <- testing("models/mlr_model.rds", test_data)
-# print(test_results)
+```{r, eval=FALSE}
+test_results <- testing("models/mlr_model.rds", test_data)
+print(test_results)
 ```
 
 ## 7. Visualization
-To help interpretation, `visualization()` helps generate three types of plots: confusion matrix, random forest feature importance, and predicted probabilities. To avoid creating files in the vignette, we show an examples without running them. 
+To help interpretation, visualization functions help generate three types of plots: confusion matrix, random forest feature importance, and predicted probabilities.
 ```{r}
 # 1. Confusion Matrix Plot
+helper_conf_table <- data.frame(
+  True = c("low risk", "mid risk", "high risk",
+           "low risk", "mid risk", "high risk",
+           "low risk", "mid risk", "high risk"),
+  Predicted = c("low risk", "low risk", "low risk",
+                "mid risk", "mid risk", "mid risk",
+                "high risk", "high risk", "high risk"),
+  Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
+  Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)
+)
 
-# helper_conf_table <- data.frame(
-#                True = c("low risk", "mid risk", "high risk",
-#                        "low risk", "mid risk", "high risk",
-#                        "low risk", "mid risk", "high risk"),
-#                Predicted = c("low risk", "low risk", "low risk",
-#                                "mid risk", "mid risk", "mid risk",
-#                                "high risk", "high risk", "high risk"),
-#                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
-#                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0))
-#                
-# visualization("conf_matrix", helper_conf_table, conf_type = "mlr", output_dir = "outputs")
+plot_conf_matrix(helper_conf_table, conf_type = "mlr", output_dir = tempdir())
+```
 
+```{r, eval=FALSE}
+# 2. Random Forest Feature Importance Plot
+# We avoid executing this because the example train_data has limited observations. 
 
-# 2. Random Forest Feature Importance plot
+rf_model <- training_rf_model(train_data)
+plot_feature_importance(rf_model, output_dir = tempdir())
+```
 
-# rf_model <- training_rf_model(train_data)
+```{r}
+# 3. Predicted Probability vs. Blood Sugar Plot
 
-# visualization("feature_importance", rf_model, conf_type = NULL, output_dir = "outputs")
+prob_table <- data.frame(
+  BS = rep(seq(5.5, 8.0, by = 0.1), 3),
+  Probability = runif(78, 0.2, 0.9),
+  RiskLevel = factor(rep(c("low risk", "mid risk", "high risk"), each = 26))
+)
 
-# 3. Predicted Probability vs Blood Sugar plot
-
-# prob_table <- data.frame(
-#   BS = c(4.5, 5.0, 5.5, 6.0, 6.5, 7.0),
-#   Probability = c(0.2, 0.3, 0.5, 0.6, 0.7, 0.9),
-#   RiskLevel = factor(c("low risk", "low risk", "mid risk", "mid risk", "high risk", "high risk"))
-#   )
-
-# visualization("pred_prob", prob_table, conf_type = NULL, output_dir = "outputs")
+plot_pred_prob(prob_table, output_dir = tempdir())
 ```
 
 
