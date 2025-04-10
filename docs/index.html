@@ -54,7 +54,7 @@
 <div class="page-header"><h1 id="maternalhealthtools">maternalhealthtools<a class="anchor" aria-label="anchor" href="#maternalhealthtools"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
+
 <p>The goal of maternalhealthtools is to provide reusable functions for cleaning, training, testing, and visualizing maternal health data. It includes tools for handling missing or inconsistent data, training and testing multinomial logistic regression and random forest models, and generating plot for exploratory analysis and model interpretation.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -161,46 +161,46 @@
 <code class="sourceCode R"><span><span class="co"># Example usage</span></span>
 <span><span class="co"># testing("path/to/mlr_model.rds", test_data)</span></span></code></pre></div>
 <p>Note: Since the function depends on a trained model file, examples are not run in the README file.</p>
-<p>The visualization() helps generate three types of plots:</p>
+<p>For visualization we can use three distinct plotting functions:</p>
 <ol style="list-style-type: decimal">
-<li>Confusion Matrix plot</li>
-<li>Random Forest Feature Importance plot</li>
-<li>Predicted Probability vs Blood Sugar plot</li>
+<li>Confusion Matrix plot - plot_conf_matrix()</li>
+<li>Random Forest Feature Importance plot - plot_feature_importance()</li>
+<li>Predicted Probability vs Blood Sugar plot - plot_pred_prob()</li>
 </ol>
-<p>This function is useful for model visualization and interpretation. It saves the generated plot to a file in the specified output directory.</p>
+<p>These functions are useful for model visualization and interpretation. It saves the generated plot to a file in the specified output directory.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Example usage</span></span>
-<span><span class="co"># 1. Confusion Matrix Plot example</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Confusion Matrix Plot</span></span>
 <span></span>
 <span><span class="co"># helper_conf_table &lt;- data.frame(</span></span>
-<span><span class="co">#                True = c("low risk", "mid risk", "high risk",</span></span>
-<span><span class="co">#                        "low risk", "mid risk", "high risk",</span></span>
-<span><span class="co">#                        "low risk", "mid risk", "high risk"),</span></span>
-<span><span class="co">#                Predicted = c("low risk", "low risk", "low risk",</span></span>
-<span><span class="co">#                                "mid risk", "mid risk", "mid risk",</span></span>
-<span><span class="co">#                                "high risk", "high risk", "high risk"),</span></span>
-<span><span class="co">#                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),</span></span>
-<span><span class="co">#                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0))</span></span>
-<span><span class="co">#                </span></span>
-<span><span class="co"># visualization("conf_matrix", helper_conf_table, conf_type = "mlr", output_dir = "outputs")</span></span>
+<span><span class="co">#   True = c("low risk", "mid risk", "high risk",</span></span>
+<span><span class="co">#            "low risk", "mid risk", "high risk",</span></span>
+<span><span class="co">#            "low risk", "mid risk", "high risk"),</span></span>
+<span><span class="co">#   Predicted = c("low risk", "low risk", "low risk",</span></span>
+<span><span class="co">#                 "mid risk", "mid risk", "mid risk",</span></span>
+<span><span class="co">#                 "high risk", "high risk", "high risk"),</span></span>
+<span><span class="co">#   Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),</span></span>
+<span><span class="co">#   Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)</span></span>
+<span><span class="co"># )</span></span>
+<span></span>
+<span><span class="co"># plot_conf_matrix(helper_conf_table, conf_type = "mlr", output_dir = "outputs")</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># 2. Random Forest Feature Importance plot</span></span>
+<span><span class="co"># 2. Random Forest Feature Importance</span></span>
 <span></span>
 <span><span class="co"># rf_model &lt;- training_rf_model(train_data)</span></span>
+<span><span class="co"># plot_feature_importance(rf_model, output_dir = "outputs")</span></span>
 <span></span>
-<span><span class="co"># visualization("feature_importance", rf_model, conf_type = NULL, output_dir = "outputs")</span></span>
 <span></span>
-<span><span class="co"># 3. Predicted Probability vs Blood Sugar plot</span></span>
+<span><span class="co"># 3. Predicted Probability vs. Blood Sugar</span></span>
 <span></span>
 <span><span class="co"># prob_table &lt;- data.frame(</span></span>
 <span><span class="co">#   BS = c(4.5, 5.0, 5.5, 6.0, 6.5, 7.0),</span></span>
 <span><span class="co">#   Probability = c(0.2, 0.3, 0.5, 0.6, 0.7, 0.9),</span></span>
 <span><span class="co">#   RiskLevel = factor(c("low risk", "low risk", "mid risk", "mid risk", "high risk", "high risk"))</span></span>
-<span><span class="co">#   )</span></span>
+<span><span class="co"># )</span></span>
 <span></span>
-<span><span class="co"># visualization("pred_prob", prob_table, conf_type = NULL, output_dir = "outputs")</span></span></code></pre></div>
-<p>Note: Since the function depends on input and output files, examples are not run in the README file. For more information on the visualization() function, reading the visualization.R script is recommended.</p>
+<span><span class="co"># plot_pred_prob(prob_table, output_dir = "outputs")</span></span></code></pre></div>
+<p>Note: Since the function depends on input and output files, examples are not run in the README file. For more information about the visualization functions, reading the visualization.R script is recommended.</p>
 </div>
 <div class="section level2">
 <h2 id="position-in-the-r-package-ecosystem">Position in the R Package Ecosystem<a class="anchor" aria-label="anchor" href="#position-in-the-r-package-ecosystem"></a>
@@ -241,7 +241,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://app.codecov.io/gh/DSCI-310-2025/maternalhealthtools" class="external-link"><img src="https://codecov.io/gh/DSCI-310-2025/maternalhealthtools/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

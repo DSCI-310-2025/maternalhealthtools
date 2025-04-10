@@ -4,9 +4,11 @@
 # maternalhealthtools
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/DSCI-310-2025/maternalhealthtools/graph/badge.svg)](https://app.codecov.io/gh/DSCI-310-2025/maternalhealthtools)
 [![test-coverage](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/DSCI-310-2025/maternalhealthtools/actions/workflows/test-coverage.yaml)
+
 <!-- badges: end -->
 
 The goal of maternalhealthtools is to provide reusable functions for
@@ -153,52 +155,52 @@ class probabilities are also available but is disabled by default.
 Note: Since the function depends on a trained model file, examples are
 not run in the README file.
 
-The visualization() helps generate three types of plots:
+For visualization we can use three distinct plotting functions:
 
-1.  Confusion Matrix plot
-2.  Random Forest Feature Importance plot
-3.  Predicted Probability vs Blood Sugar plot
+1.  Confusion Matrix plot - plot_conf_matrix()
+2.  Random Forest Feature Importance plot - plot_feature_importance()
+3.  Predicted Probability vs Blood Sugar plot - plot_pred_prob()
 
-This function is useful for model visualization and interpretation. It
-saves the generated plot to a file in the specified output directory.
+These functions are useful for model visualization and interpretation.
+It saves the generated plot to a file in the specified output directory.
 
 ``` r
-# Example usage
-# 1. Confusion Matrix Plot example
+# 1. Confusion Matrix Plot
 
 # helper_conf_table <- data.frame(
-#                True = c("low risk", "mid risk", "high risk",
-#                        "low risk", "mid risk", "high risk",
-#                        "low risk", "mid risk", "high risk"),
-#                Predicted = c("low risk", "low risk", "low risk",
-#                                "mid risk", "mid risk", "mid risk",
-#                                "high risk", "high risk", "high risk"),
-#                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
-#                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0))
-#                
-# visualization("conf_matrix", helper_conf_table, conf_type = "mlr", output_dir = "outputs")
+#   True = c("low risk", "mid risk", "high risk",
+#            "low risk", "mid risk", "high risk",
+#            "low risk", "mid risk", "high risk"),
+#   Predicted = c("low risk", "low risk", "low risk",
+#                 "mid risk", "mid risk", "mid risk",
+#                 "high risk", "high risk", "high risk"),
+#   Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
+#   Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)
+# )
+
+# plot_conf_matrix(helper_conf_table, conf_type = "mlr", output_dir = "outputs")
 
 
-# 2. Random Forest Feature Importance plot
+# 2. Random Forest Feature Importance
 
 # rf_model <- training_rf_model(train_data)
+# plot_feature_importance(rf_model, output_dir = "outputs")
 
-# visualization("feature_importance", rf_model, conf_type = NULL, output_dir = "outputs")
 
-# 3. Predicted Probability vs Blood Sugar plot
+# 3. Predicted Probability vs. Blood Sugar
 
 # prob_table <- data.frame(
 #   BS = c(4.5, 5.0, 5.5, 6.0, 6.5, 7.0),
 #   Probability = c(0.2, 0.3, 0.5, 0.6, 0.7, 0.9),
 #   RiskLevel = factor(c("low risk", "low risk", "mid risk", "mid risk", "high risk", "high risk"))
-#   )
+# )
 
-# visualization("pred_prob", prob_table, conf_type = NULL, output_dir = "outputs")
+# plot_pred_prob(prob_table, output_dir = "outputs")
 ```
 
 Note: Since the function depends on input and output files, examples are
-not run in the README file. For more information on the visualization()
-function, reading the visualization.R script is recommended.
+not run in the README file. For more information about the visualization
+functions, reading the visualization.R script is recommended.
 
 ## Position in the R Package Ecosystem
 

@@ -3,40 +3,20 @@ utils::globalVariables(c("True", "Predicted", "Frequency", "Percentage",
 
 # R/visualization.R
 
-#' Create visualizations
+#' Plot confusion Matrix
 #'
-#' Creates and predicted probability, confusion matrices or
-#' random forest feature importance plots
-#'
-#' @param plot_type Character string specifying the type of plot to generate.
-#'   Must be one of:
-#'   - `"conf_matrix"` for confusion matrix visualization
-#'   - `"feature_importance"` for feature importance plot
-#'   - `"pred_prob"` for predicted probabilities plot
-#'
-#' @param input The input file for the visualization:
-#'   - For `"conf_matrix"`: A data frame containing the confusion matrix data with
+#' @param input A data frame containing the confusion matrix data with
 #'     columns `True`, `Predicted`, `Frequency`, and `Percentage`.
-#'   - For `"feature_importance"`: A trained model object (e.g., Random Forest model)
-#'     for extracting feature importance scores.
-#'   - For `"pred_prob"`: A data frame containing predicted probabilities with
-#'     columns `BS` (blood sugar levels) and `Probability`.
-#'
 #' @param conf_type Character string specifying the confusion matrix type.
-#'   Required only if `plot_type = "conf_matrix"`. Must be one of:
-#'   - `"baseline"` for the Baseline Confusion Matrix
-#'   - `"mlr"` for the MLR Confusion Matrix
-#'   - `"rf"` for the Random Forest Confusion Matrix
-#'   If not using `plot_type = "conf_matrix"`, then specify `NULL`
-#'
-#' @param output_dir Character string specifying the directory path where the
-#'   output plot will be saved. Ensure the directory exists.
-#'
-#'
-#' @return saves the generated plot as a .png file in the specified `output_dir`.
+#'  - `"baseline"` for the Baseline Confusion Matrix
+#'  - `"mlr"` for the MLR Confusion Matrix
+#'  - `"rf"` for the Random Forest Confusion Matrix
+#' @param output_dir Path to save the output .png file
+#' @return Saves the feature importance plot and returns the plot object.
 #'
 #' @importFrom caret confusionMatrix
 #' @export
+#'
 #' @examples
 #' helper_test_data <- tibble::tibble(
 #'   Age = sample(10:50, 100, replace = TRUE),
@@ -85,68 +65,84 @@ utils::globalVariables(c("True", "Predicted", "Frequency", "Percentage",
 #'   dplyr::mutate(Percentage = ifelse(is.na(Frequency), 0,
 #'     round((Frequency / sum(Frequency)) * 100, 1)))
 #'
-#' visualization("conf_matrix", helper_conf_table, "mlr", tempdir())
+#' plot_conf_matrix(helper_conf_table, "mlr", tempdir())
 
+plot_conf_matrix <- function(input, conf_type, output_dir) {
+  conf_matrix_title <- switch(conf_type,
+                              "baseline" = "Baseline Confusion Matrix",
+                              "mlr" = "MLR Confusion Matrix",
+                              "rf" = "Random Forest Confusion Matrix",
+                              stop("Invalid 'conf_type'. Use 'baseline', 'mlr', or 'rf'.")
+  )
 
-visualization <- function(plot_type, input, conf_type, output_dir){
+  plot <- ggplot2::ggplot(input, ggplot2::aes(x = True, y = Predicted, fill = Frequency)) +
+    ggplot2::geom_tile(color = "black") +
+    ggplot2::geom_text(ggplot2::aes(label = paste0(Frequency, "\n(", Percentage, "%)")),
+                       color = "black", size = 6) +
+    ggplot2::scale_fill_gradient(low = "white", high = "blue") +
+    ggplot2::labs(title = conf_matrix_title, x = "True Label", y = "Predicted Label") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"))
 
-    # check parameter types
-    if (!is.null(conf_type) && plot_type != "conf_matrix") {
-        stop("`conf_type` should only be used with `plot_type = 'conf_matrix'`.")
-    }
-
-    if (!is.character(output_dir)) {
-        stop("`output_dir` must be a character string representing the path.")
-    }
-
-    # Confusion matrix plots
-    if (plot_type == "conf_matrix") {
-        if (is.null(conf_type)) {
-            stop("'conf_type' is required for 'conf_matrix' plot_type.")
-        }
-
-        conf_matrix_title <- switch(conf_type,
-                                "baseline" = "Baseline Confusion Matrix",
-                                "mlr" = "MLR Confusion Matrix",
-                                "rf" = "Random Forest Confusion Matrix",
-                                stop("Invalid 'conf_type'. Use 'base', 'mlr', or 'rf'."))
-
-        plot <- ggplot2::ggplot(input, ggplot2::aes(x = True, y = Predicted, fill = Frequency)) +
-          ggplot2::geom_tile(color = "black") +
-          ggplot2::geom_text(ggplot2::aes(label = paste0(Frequency, "\n(", Percentage, "%)")), color = "black", size = 6) +
-          ggplot2::scale_fill_gradient(low = "white", high = "blue") +
-          ggplot2::labs(title = conf_matrix_title, x = "True Label", y = "Predicted Label") +
-          ggplot2::theme_minimal() +
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"))
-
-        output_path <- file.path(output_dir, paste0( conf_type, "_conf_matrix.png"))
-
-    # RF feature importance plot
-    } else if (plot_type == "feature_importance") {
-        plot <- vip::vip(input) +
-          ggplot2::labs(title = 'Random Forest Feature Importance',
-                 x = "Feature", y = "Importance") +
-          ggplot2::theme_minimal() +
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold", size = 14))
-
-        output_path <- file.path(output_dir, "rf_feature_importance.png")
-
-    # Predicted probabilities plot
-    } else if (plot_type == "pred_prob") {
-        plot <- ggplot2::ggplot(input, ggplot2::aes(x = BS, y = Probability, color = RiskLevel)) +
-          ggplot2::geom_smooth(method = "gam", formula = y ~ s(x, bs = 'cs'), se = FALSE, linewidth = 1) +
-          ggplot2::theme_minimal() +
-          ggplot2::labs(title = "Predicted Probabilities Across Blood Sugar Levels",
-                 x = "Blood Sugar (BS)", y = "Predicted Probability") +
-          ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"))
-
-        output_path <- file.path(output_dir,"blood_sugar_plot.png")
-
-    } else {
-        stop("Invalid plot type. Please use 'feature_importance', 'pred_prob', or 'conf_matrix'")
-    }
-
+  output_path <- file.path(output_dir, paste0(conf_type, "_conf_matrix.png"))
   ggplot2::ggsave(output_path, plot, width = 8, height = 6, dpi = 300)
-    return(plot)
-
+  return(plot)
 }
+
+#' Plot Feature Importance from Random Forest
+#'
+#' @param model A trained model object (e.g., Random Forest model)
+#'     for extracting feature importance scores.
+#' @param output_dir Path to save the output .png file
+#' @return Saves the feature importance plot and returns the plot object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' rf_model <- training_rf_model(train_data)
+#' plot_feature_importance(rf_model, tempdir())
+#' }
+
+plot_feature_importance <- function(model, output_dir) {
+  plot <- vip::vip(model) +
+    ggplot2::labs(title = "Random Forest Feature Importance",
+                  x = "Feature", y = "Importance") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold", size = 14))
+
+  output_path <- file.path(output_dir, "rf_feature_importance.png")
+  ggplot2::ggsave(output_path, plot, width = 8, height = 6, dpi = 300)
+  return(plot)
+}
+
+#' Plot Predicted Probabilities by Blood Sugar Level
+#'
+#' @param input A data frame containing predicted probabilities with
+#'     columns `BS` (blood sugar levels) and `Probability`.
+#' @param output_dir Path to save the output .png file
+#' @return Saves the probability plot and returns the plot object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' prob_table <- data.frame(
+#'   BS = rep(seq(5.5, 8.0, by = 0.1), 3),
+#'   Probability = runif(78, 0.2, 0.9),
+#'   RiskLevel = factor(rep(c("low risk", "mid risk", "high risk"), each = 26))
+#' )
+#' plot_pred_prob(prob_table, tempdir())
+#' }
+
+plot_pred_prob <- function(input, output_dir) {
+  plot <- ggplot2::ggplot(input, ggplot2::aes(x = BS, y = Probability, color = RiskLevel)) +
+    ggplot2::geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), se = FALSE, linewidth = 1) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(title = "Predicted Probabilities Across Blood Sugar Levels",
+                  x = "Blood Sugar (BS)", y = "Predicted Probability") +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"))
+
+  output_path <- file.path(output_dir, "blood_sugar_plot.png")
+  ggplot2::ggsave(output_path, plot, width = 8, height = 6, dpi = 300)
+  return(plot)
+}
+

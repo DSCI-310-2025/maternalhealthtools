@@ -52,3 +52,10 @@ test_that("clean does not convert non-categorical target but still drops NAs and
   expect_equal(nrow(cleaned), 3)
   expect_type(cleaned$RiskScore, "double")
 })
+
+
+test_that("cleaning functions throw errors for invalid input", {
+  expect_error(clean(data.frame(), data.frame()))
+  expect_error(clean("not_a_df", not_a_column))
+})
+

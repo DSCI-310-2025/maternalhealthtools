@@ -3,115 +3,78 @@ library(maternalhealthtools)
 library(dplyr)
 library(ggplot2)
 library(randomForest)
-library(tidyverse)
+library(tibble)
 library(caret)
+library(vip)
+library(nnet)
 
 if (!dir.exists("outputs/images")) {
   dir.create("outputs/images", recursive = TRUE)
 }
 
-# testing cases
+test_that("plot_conf_matrix() creates a confusion matrix plot and saves a file", {
+  conf_data <- data.frame(
+    True = c("low risk", "mid risk", "high risk",
+             "low risk", "mid risk", "high risk",
+             "low risk", "mid risk", "high risk"),
+    Predicted = c("low risk", "low risk", "low risk",
+                  "mid risk", "mid risk", "mid risk",
+                  "high risk", "high risk", "high risk"),
+    Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
+    Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)
+  )
+  output_path <- file.path("outputs/images", "mlr_conf_matrix.png")
+  plot <- plot_conf_matrix(conf_data, "mlr", "outputs/images")
 
-test_that("`visualization()` should return the correct file name in the specified location.", {
-  helper_conf_table <- data.frame(
-                True = c("low risk", "mid risk", "high risk",
-                        "low risk", "mid risk", "high risk",
-                        "low risk", "mid risk", "high risk"),
-                Predicted = c("low risk", "low risk", "low risk",
-                                "mid risk", "mid risk", "mid risk",
-                                "high risk", "high risk", "high risk"),
-                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
-                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)
-                )
-  visualization("conf_matrix", helper_conf_table, "mlr", "outputs/images")
-  expect_true(file.exists("outputs/images/mlr_conf_matrix.png"))
+  expect_s3_class(plot, "ggplot")
+  expect_true(file.exists(output_path))
+  expect_true("GeomTile" %in% class(plot$layers[[1]]$geom))
+  expect_equal(plot$labels$x, "True Label")
+  expect_equal(plot$labels$y, "Predicted Label")
 })
 
+test_that("plot_feature_importance() creates a plot and saves a file", {
+  n <- 200
+  helper_data <- tibble(
+    Age = sample(18:50, n, TRUE),
+    SystolicBP = sample(90:180, n, TRUE),
+    DiastolicBP = sample(60:120, n, TRUE),
+    BS = runif(n, 6, 15),
+    BodyTemp = rnorm(n, 98.6, 0.7),
+    HeartRate = sample(60:110, n, TRUE),
+    RiskLevel = sample(c("low risk", "mid risk", "high risk"), n, TRUE)
+  ) %>%
+    mutate(RiskLevel = factor(RiskLevel))
 
-test_that("`visualization()` should use `geom_tile()` for `conf_matrix` and check if using the right data and if axes have the right labels,
-          use `geom_smooth` for `pred_prob` and check if using the right data and if axes have the right labels,
-          map x-axis to Feature and y-axis to Importance for 'feature_importance'", {
+  model <- randomForest(RiskLevel ~ ., data = helper_data, ntree = 100, importance = TRUE)
+  plot <- plot_feature_importance(model, "outputs/images")
 
-            set.seed(123)
-            # create conf_matrix using visualization()
-            helper_conf_table <- data.frame(
-                True = c("low risk", "mid risk", "high risk",
-                        "low risk", "mid risk", "high risk",
-                        "low risk", "mid risk", "high risk"),
-                Predicted = c("low risk", "low risk", "low risk",
-                                "mid risk", "mid risk", "mid risk",
-                                "high risk", "high risk", "high risk"),
-                Frequency = c(9, 17, 9, 10, 6, 9, 8, 14, 18),
-                Percentage = c(33.3, 45.9, 25.0, 37.0, 16.2, 25.0, 29.6, 37.8, 50.0)
-                )
-            helper_plot_conf <- visualization("conf_matrix", helper_conf_table, "mlr", "outputs/images")
-
-            # create pred_prob plot using visualization()
-            risk_levels <- rep(c("low risk", "mid risk", "high risk"), length.out = 300)
-            risk_levels <- sample(risk_levels)
-            prob_long <- data.frame(
-                BS = round(sample(c(7.19, 8.06, 8.43, 11.22, 11.61), 300, replace = TRUE) + rnorm(300, mean = 0, sd = 0.05), 2),
-                RiskLevel = risk_levels,
-                Probability = round(runif(300, min = 0.1, max = 0.7), 4)
-            )
-            helper_plot_pred_prob <- visualization("pred_prob", prob_long, NULL, "outputs/images")
-
-            # create feature_importances plot using visualization()
-            n <- 300
-            Age <- sample(15:60, n, replace = TRUE)
-            SystolicBP <- sample(85:160, n, replace = TRUE)
-            DiastolicBP <- sample(60:100, n, replace = TRUE)
-            BS <- round(runif(n, min = 5.5, max = 20), 2)
-            BodyTemp <- round(rnorm(n, mean = 98.5, sd = 1), 1)
-            HeartRate <- sample(60:100, n, replace = TRUE)
-
-            RiskLevel <- ifelse(
-              SystolicBP > 140 | BS > 13 | HeartRate > 85,
-              "high risk",
-              ifelse(
-                SystolicBP < 100 & BS < 8 & HeartRate < 75,
-                "low risk",
-                "mid risk"))
-            helper_data <- data.frame(
-              Age,
-              SystolicBP,
-              DiastolicBP,
-              BS,
-              BodyTemp,
-              HeartRate,
-              RiskLevel) %>%
-              mutate(RiskLevel = as.factor(RiskLevel))
-
-            helper_rf_model <- randomForest(RiskLevel ~ ., data = helper_data, ntree = 500, importance = TRUE)
-            helper_plot_feat_imp <- visualization("feature_importance", helper_rf_model, NULL, "outputs/images")
-
-            # test cases for confidence matrix
-            expect_true("GeomTile" %in% c(class(helper_plot_conf$layers[[1]]$geom)))
-            expect_true(helper_plot_conf$labels$x == "True Label")
-            expect_true(helper_plot_conf$labels$y == "Predicted Label")
-            expect_true(all(helper_plot_conf$data[1:4] == helper_conf_table))
-
-            # test cases for predicted probability
-            expect_true("GeomSmooth" %in% c(class(helper_plot_pred_prob$layers[[1]]$geom)))
-            expect_true(helper_plot_pred_prob$labels$x == "Blood Sugar (BS)")
-            expect_true(helper_plot_pred_prob$labels$y == "Predicted Probability")
-            expect_true(all(helper_plot_pred_prob$data ==prob_long))
-
-            # test cases for feature importances
-            expect_true(helper_plot_feat_imp$labels$x == "Feature")
-            expect_true(helper_plot_feat_imp$labels$y == "Importance")
+  expect_s3_class(plot, "ggplot")
+  expect_equal(plot$labels$x, "Feature")
+  expect_equal(plot$labels$y, "Importance")
+  expect_true(file.exists("outputs/images/rf_feature_importance.png"))
 })
 
+test_that("plot_pred_prob() creates a smooth probability plot", {
+  df <- tibble(
+    BS = rep(seq(5.5, 8.0, by = 0.1), 3),
+    Probability = runif(78, 0.2, 0.9),
+    RiskLevel = rep(c("low risk", "mid risk", "high risk"), each = 26)
+  )
 
-test_that("`visualization` should throw an error when invalid parameters are used.", {
-  expect_error(visualization("pred_prob", prob_long, NULL, 123))
-  expect_error(visualization("pred_prob", prob_long, "outputs/images"))
-  expect_error(visualization(pred_prob, prob_long, NULL, "outputs/images"))
-  expect_error(visualization("pred_prob", "prob_long", NULL, "outputs/images"))
-  expect_error(visualization("pred_prob", prob_long, "mlr", "outputs/images"))
-  expect_error(visualization("predicted_prob", prob_long, NULL, "outputs/images"))
-  expect_error(visualization("conf_matrix", mlr_table, mlr, "outputs/images"))
-  expect_error(visualization("conf_matrix", mlr_table, "regression", "outputs/images"))
-  expect_error(visualization("confusion_matrix", mlr_table, "mlr", "outputs/images"))
+  plot <- plot_pred_prob(df, "outputs/images")
+
+  expect_s3_class(plot, "ggplot")
+  expect_true("GeomSmooth" %in% class(plot$layers[[1]]$geom))
+  expect_equal(plot$labels$x, "Blood Sugar (BS)")
+  expect_equal(plot$labels$y, "Predicted Probability")
+  expect_true(file.exists("outputs/images/blood_sugar_plot.png"))
 })
 
+test_that("plot functions throw errors for invalid input", {
+  expect_error(plot_conf_matrix("not a df", "mlr", "outputs/images"))
+  expect_error(plot_conf_matrix(data.frame(), "invalid_type", "outputs/images"))
+  expect_error(plot_feature_importance("not a model", "outputs/images"))
+  expect_error(plot_feature_importance(data.frame(), data.frame()))
+  expect_error(plot_pred_prob("not a df", "outputs/images"))
+})

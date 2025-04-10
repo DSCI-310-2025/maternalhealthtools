@@ -2,7 +2,7 @@ library(testthat)
 library(maternalhealthtools)
 library(tibble)
 library(nnet)
-library(tidyverse)
+library(dplyr)
 library(randomForest)
 
 test_that("testing() works with correct input", {
