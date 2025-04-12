@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   maternalhealthtools-vignette: maternalhealthtools-vignette.html
-last_built: 2025-04-10T23:14Z
+last_built: 2025-04-12T09:39Z
 urls:
   reference: https://dsci-310-2025.github.io/maternalhealthtools/reference
   article: https://dsci-310-2025.github.io/maternalhealthtools/articles
